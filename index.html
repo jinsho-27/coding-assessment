@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supplier Management</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">Logo</div>
+    <nav>
+      <a href="#" class="nav-item active">Suppliers</a>
+      <a href="#" class="nav-item">Products</a>
+      <a href="#" class="nav-item">Orders</a>
+      <a href="#" class="nav-item">Settings</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h1>SUPPLIER MANAGEMENT</h1>
+      <div class="user-area">
+        <span class="user-name">Invat User</span>
+        <span class="user-role">Administrator</span>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="content-header">
+        <h2>Suppliers</h2>
+        <button id="addSupplierBtn" class="btn-primary">+ Add Supplier</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+          <tr>
+            <th>SUPPLIER NAME</th>
+            <th>SUPPLIER ID</th>
+            <th>ADDRESS LINE 1</th>
+            <th>ADDRESS LINE 2</th>
+            <th>CONTACT NUMBER</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+          </thead>
+          <tbody id="supplierBody">
+          <tr>
+            <td>ABC</td>
+            <td>1234785</td>
+            <td>ANAND</td>
+            <td>Revada</td>
+            <td>+91 123457890</td>
+            <td><span class="badge badge-active">Active</span></td>
+            <td>
+              <button class="icon-btn edit">✏</button>
+              <button class="icon-btn delete">🗑</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="java.js"></script>
+</body>
+</html>
