@@ -350,7 +350,7 @@
     }
 
     let currentSort = { field: 'name', direction: 'asc' };
-    const PAGE_SIZE = 10; // show 10 items per page
+    const PAGE_SIZE = 10; 
     let currentPage = 1;
 
     function renderSuppliers(filterText = "") {
@@ -371,7 +371,6 @@
           );
         });
 
-      // Apply sorting
       filtered.sort((a, b) => {
         const field = currentSort.field;
         const da = (a[field] || "").toString().toLowerCase();
@@ -381,7 +380,6 @@
         return 0;
       });
 
-      // Pagination
       const total = filtered.length;
       const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
       if (currentPage > totalPages) currentPage = totalPages;
@@ -410,7 +408,6 @@
         tbody.appendChild(row);
       });
 
-      // Update pagination controls
       renderPagination(totalPages);
     }
 
@@ -427,7 +424,6 @@
       prev.disabled = currentPage === 1;
       container.appendChild(prev);
 
-      // page numbers
       for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement('button');
         btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
@@ -449,8 +445,8 @@
       supplier._id = supplier._id || Date.now().toString();
       suppliers.push(supplier);
       saveSuppliers(suppliers);
-      // move to last page where the new supplier will appear
-      currentPage = Math.ceil(suppliers.length / PAGE_SIZE);
+    
+      currentPage = Math.ceil(suppliappearers.length / PAGE_SIZE);
       renderSuppliers(document.getElementById("search-input").value);
     }
 
@@ -488,7 +484,7 @@
       const suppliers = loadSuppliers();
       const updated = suppliers.filter(s => s._id !== id);
       saveSuppliers(updated);
-      // adjust current page if it becomes out-of-range
+    
       const totalPages = Math.max(1, Math.ceil(updated.length / PAGE_SIZE));
       if (currentPage > totalPages) currentPage = totalPages;
       renderSuppliers(document.getElementById("search-input").value);
@@ -525,20 +521,18 @@
       });
 
       searchInput.addEventListener("input", e => {
-        currentPage = 1; // reset to first page when filtering
+        currentPage = 1; 
         renderSuppliers(e.target.value);
       });
 
       if (sortBtn) {
         sortBtn.addEventListener('click', () => {
           currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-          currentPage = 1; // reset page when changing sort
+          currentPage = 1;
           updateSortButton();
           renderSuppliers(searchInput.value);
         });
       }
-
-      // Pagination click handling
       const pagination = document.getElementById('pagination');
       if (pagination) {
         pagination.addEventListener('click', (e) => {
