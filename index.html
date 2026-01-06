@@ -101,6 +101,59 @@
     .btn-primary:hover {
       background: #23239a;
     }
+
+    /* Add Supplier form */
+    .supplier-form {
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      display: grid;
+      gap: 8px;
+    }
+    .supplier-form h3 { font-size: 14px; }
+    .supplier-form .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      align-items: start;
+    }
+    .supplier-form label { font-size: 12px; color: #374151; }
+    .supplier-form input[type="text"] { width: 100%; padding: 6px 8px; border-radius: 4px; border: 1px solid #d1d5db; font-size: 13px; }
+    .form-actions { display:flex; gap:8px; justify-content:flex-end; }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      justify-content: flex-end;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      margin-top: 8px;
+      border-radius: 6px;
+      flex-wrap: wrap;
+    }
+    .page-btn {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .page-btn[disabled], .page-btn.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .page-btn.active {
+      background: #2b2bb2;
+      color: #fff;
+      border-color: #2b2bb2;
+    }
+
     .table-wrapper {
       background: #ffffff;
       border-radius: 6px;
@@ -182,9 +235,25 @@
   <h2>Suppliers</h2>
   <input type="text" id="search-input" placeholder="Search Suppliers..." />
   <button id="search-btn" class="btn-primary">Search</button>
+  <button id="sortBtn" class="btn-primary" aria-pressed="false" title="Toggle sort">Sort: A→Z</button>
   <button id="addSupplierBtn" class="btn-primary">+ Add Supplier</button>
 </div>
 
+      <div id="supplierForm" class="supplier-form" style="display:none;">
+        <h3>Add Supplier</h3>
+        <div class="form-row">
+          <label>Name<br /><input id="supplier-name" type="text" /></label>
+          <label>Supplier ID<br /><input id="supplier-id" type="text" /></label>
+          <label>Contact Number<br /><input id="supplier-contact" type="text" /></label>
+          <label>Address Line 1<br /><input id="supplier-addr1" type="text" /></label>
+          <label>Address Line 2<br /><input id="supplier-addr2" type="text" /></label>
+          <label style="align-items:center; display:flex; gap:8px;">Active<br /><input id="supplier-active" type="checkbox" checked /></label>
+        </div>
+        <div class="form-actions">
+          <button id="saveSupplierBtn" class="btn-primary">Save</button>
+          <button id="cancelSupplierBtn" class="btn-primary" style="background:#e5e7eb;color:#111">Cancel</button>
+        </div>
+      </div>
 
       <div class="table-wrapper">
         <table>
@@ -203,6 +272,7 @@
           </tbody>
         </table>
       </div>
+      <div id="pagination" class="pagination" aria-label="Pagination"></div>
     </section>
   </div>
 
@@ -279,6 +349,10 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(suppliers));
     }
 
+    let currentSort = { field: 'name', direction: 'asc' };
+    const PAGE_SIZE = 10; // show 10 items per page
+    let currentPage = 1;
+
     function renderSuppliers(filterText = "") {
       const tbody = document.getElementById("supplierBody");
       tbody.innerHTML = "";
@@ -286,8 +360,7 @@
 
       const normalizedFilter = filterText.toLowerCase();
 
-      suppliers
-        .filter(s => {
+      const filtered = suppliers.filter(s => {
           if (!normalizedFilter) return true;
           return (
             s.name.toLowerCase().includes(normalizedFilter) ||
@@ -296,52 +369,128 @@
             (s.addressLine2 || "").toLowerCase().includes(normalizedFilter) ||
             (s.contactNumber || "").toLowerCase().includes(normalizedFilter)
           );
-        })
-        .forEach(supplier => {
-          const row = document.createElement("tr");
-          row.dataset.id = supplier._id;
-          row.innerHTML = `
-            <td>${supplier.name}</td>
-            <td>${supplier.supplierId}</td>
-            <td>${supplier.addressLine1 || ""}</td>
-            <td>${supplier.addressLine2 || ""}</td>
-            <td>${supplier.contactNumber || ""}</td>
-            <td>
-              <span class="badge ${supplier.active ? "badge-active" : "badge-inactive"}">
-                ${supplier.active ? "Active" : "Inactive"}
-              </span>
-            </td>
-            <td>
-              <button class="icon-btn edit">✏</button>
-              <button class="icon-btn delete">🗑</button>
-            </td>
-          `;
-          tbody.appendChild(row);
         });
+
+      // Apply sorting
+      filtered.sort((a, b) => {
+        const field = currentSort.field;
+        const da = (a[field] || "").toString().toLowerCase();
+        const db = (b[field] || "").toString().toLowerCase();
+        if (da < db) return currentSort.direction === 'asc' ? -1 : 1;
+        if (da > db) return currentSort.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      // Pagination
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+      pageItems.forEach(supplier => {
+        const row = document.createElement("tr");
+        row.dataset.id = supplier._id;
+        row.innerHTML = `
+          <td>${supplier.name}</td>
+          <td>${supplier.supplierId}</td>
+          <td>${supplier.addressLine1 || ""}</td>
+          <td>${supplier.addressLine2 || ""}</td>
+          <td>${supplier.contactNumber || ""}</td>
+          <td>
+            <span class="badge ${supplier.active ? "badge-active" : "badge-inactive"}">
+              ${supplier.active ? "Active" : "Inactive"}
+            </span>
+          </td>
+          <td>
+            <button class="icon-btn edit">✏</button>
+            <button class="icon-btn delete">🗑</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Update pagination controls
+      renderPagination(totalPages);
     }
 
-    function addSupplier() {
+    function renderPagination(totalPages) {
+      const container = document.getElementById('pagination');
+      if (!container) return;
+      container.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      const prev = document.createElement('button');
+      prev.className = 'page-btn';
+      prev.textContent = 'Prev';
+      prev.dataset.page = 'prev';
+      prev.disabled = currentPage === 1;
+      container.appendChild(prev);
+
+      // page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+        btn.textContent = i;
+        btn.dataset.page = String(i);
+        container.appendChild(btn);
+      }
+
+      const next = document.createElement('button');
+      next.className = 'page-btn';
+      next.textContent = 'Next';
+      next.dataset.page = 'next';
+      next.disabled = currentPage === totalPages;
+      container.appendChild(next);
+    }
+
+    function createSupplier(supplier) {
       const suppliers = loadSuppliers();
-      const newId = Date.now().toString();
-      const newSupplier = {
-        _id: newId,
-        name: "New Supplier",
-        supplierId: `SUP${Math.floor(Math.random() * 900000 + 100000)}`,
-        contactNumber: "+91 0000000000",
-        addressLine1: "Main Street",
-        addressLine2: "City",
-        active: true,
-        userId: "user123"
-      };
-      suppliers.push(newSupplier);
+      supplier._id = supplier._id || Date.now().toString();
+      suppliers.push(supplier);
       saveSuppliers(suppliers);
+      // move to last page where the new supplier will appear
+      currentPage = Math.ceil(suppliers.length / PAGE_SIZE);
       renderSuppliers(document.getElementById("search-input").value);
+    }
+
+    function openSupplierForm() {
+      const form = document.getElementById('supplierForm');
+      if (!form) return;
+      form.style.display = 'block';
+      document.getElementById('supplier-name').value = '';
+      document.getElementById('supplier-id').value = '';
+      document.getElementById('supplier-contact').value = '';
+      document.getElementById('supplier-addr1').value = '';
+      document.getElementById('supplier-addr2').value = '';
+      document.getElementById('supplier-active').checked = true;
+    }
+
+    function closeSupplierForm() {
+      const form = document.getElementById('supplierForm');
+      if (!form) return;
+      form.style.display = 'none';
+    }
+
+    function getSupplierFormData() {
+      return {
+        name: document.getElementById('supplier-name').value.trim(),
+        supplierId: document.getElementById('supplier-id').value.trim(),
+        contactNumber: document.getElementById('supplier-contact').value.trim(),
+        addressLine1: document.getElementById('supplier-addr1').value.trim(),
+        addressLine2: document.getElementById('supplier-addr2').value.trim(),
+        active: document.getElementById('supplier-active').checked,
+        userId: 'user123'
+      };
     }
 
     function deleteSupplier(id) {
       const suppliers = loadSuppliers();
       const updated = suppliers.filter(s => s._id !== id);
       saveSuppliers(updated);
+      // adjust current page if it becomes out-of-range
+      const totalPages = Math.max(1, Math.ceil(updated.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
       renderSuppliers(document.getElementById("search-input").value);
     }
 
@@ -349,11 +498,22 @@
       const addBtn = document.getElementById("addSupplierBtn");
       const tbody = document.getElementById("supplierBody");
       const searchInput = document.getElementById("search-input");
+      const sortBtn = document.getElementById("sortBtn");
+      const saveBtn = document.getElementById('saveSupplierBtn');
+      const cancelBtn = document.getElementById('cancelSupplierBtn');
+
+      function updateSortButton() {
+        if (!sortBtn) return;
+        sortBtn.textContent = currentSort.direction === 'asc' ? 'Sort: A→Z' : 'Sort: Z→A';
+        sortBtn.setAttribute('aria-pressed', currentSort.direction === 'desc');
+      }
 
       renderSuppliers();
 
+      updateSortButton();
+
       addBtn.addEventListener("click", () => {
-        addSupplier();
+        openSupplierForm();
       });
 
       tbody.addEventListener("click", e => {
@@ -365,8 +525,55 @@
       });
 
       searchInput.addEventListener("input", e => {
+        currentPage = 1; // reset to first page when filtering
         renderSuppliers(e.target.value);
       });
+
+      if (sortBtn) {
+        sortBtn.addEventListener('click', () => {
+          currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+          currentPage = 1; // reset page when changing sort
+          updateSortButton();
+          renderSuppliers(searchInput.value);
+        });
+      }
+
+      // Pagination click handling
+      const pagination = document.getElementById('pagination');
+      if (pagination) {
+        pagination.addEventListener('click', (e) => {
+          const btn = e.target.closest('.page-btn');
+          if (!btn || btn.disabled) return;
+          const p = btn.dataset.page;
+          if (p === 'prev') {
+            if (currentPage > 1) currentPage -= 1;
+          } else if (p === 'next') {
+            currentPage += 1;
+          } else {
+            const pageNum = Number(p);
+            if (!Number.isNaN(pageNum)) currentPage = pageNum;
+          }
+          renderSuppliers(searchInput.value);
+        });
+      }
+
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          const data = getSupplierFormData();
+          if (!data.name || !data.supplierId) {
+            alert('Please provide at least Name and Supplier ID.');
+            return;
+          }
+          createSupplier(data);
+          closeSupplierForm();
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          closeSupplierForm();
+        });
+      }
     });
     
   </script>
