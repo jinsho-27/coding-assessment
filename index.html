@@ -123,6 +123,24 @@
     .supplier-form input[type="text"] { width: 100%; padding: 6px 8px; border-radius: 4px; border: 1px solid #d1d5db; font-size: 13px; }
     .form-actions { display:flex; gap:8px; justify-content:flex-end; }
 
+    .filter-panel {
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      display: grid;
+      gap: 8px;
+    }
+    .filter-panel .filter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      align-items: center;
+    }
+    .filter-panel label { font-size: 12px; color: #374151; }
+    .filter-panel input[type="text"], .filter-panel select { width: 100%; padding: 6px 8px; border-radius: 4px; border: 1px solid #d1d5db; font-size: 13px; }
+
     /* Pagination */
     .pagination {
       display: flex;
@@ -233,10 +251,10 @@
     <section class="content">
       <div class="content-header">
   <h2>Suppliers</h2>
-  <input type="text" id="search-input" placeholder="Search Suppliers..." />
-  <button id="search-btn" class="btn-primary">Search</button>
+  <input type="text" id="search-name" placeholder="Search by Name..." />
+  <input type="text" id="search-id" placeholder="Search by Supplier ID..." />
+  <button id="filterBtn" class="btn-primary">Filter</button>
   <button id="sortBtn" class="btn-primary" aria-pressed="false" title="Toggle sort">Sort: A→Z</button>
-  <button id="addSupplierBtn" class="btn-primary">+ Add Supplier</button>
 </div>
 
       <div id="supplierForm" class="supplier-form" style="display:none;">
@@ -252,6 +270,22 @@
         <div class="form-actions">
           <button id="saveSupplierBtn" class="btn-primary">Save</button>
           <button id="cancelSupplierBtn" class="btn-primary" style="background:#e5e7eb;color:#111">Cancel</button>
+        </div>
+      </div>
+
+      <div id="filterPanel" class="filter-panel" style="display:none;">
+        <div class="filter-row">
+          <label>Status<br />
+            <select id="status-filter" style="padding:6px 8px;border-radius:4px;border:1px solid #d1d5db;font-size:13px;">
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button id="applyFilterBtn" class="btn-primary">Apply</button>
+          <button id="clearFilterBtn" class="btn-primary" style="background:#e5e7eb;color:#111">Clear</button>
         </div>
       </div>
 
@@ -329,6 +363,36 @@
         addressLine2: "Block B",
         active: false,
         userId: "user123"
+      },
+      {
+        _id: "",
+        name: "Epsilon Parts",
+        supplierId: "SUP005E5",
+        contactNumber: "+971505678901",
+        addressLine1: "Sharjah Industrial Area",
+        addressLine2: "Block B",
+        active: false,
+        userId: "user123"
+      },
+         {
+        _id: "5",
+        name: "Epsilon Parts",
+        supplierId: "SUP005E5",
+        contactNumber: "+971505678901",
+        addressLine1: "Sharjah Industrial Area",
+        addressLine2: "Block B",
+        active: false,
+        userId: "user123"
+      },
+         {
+        _id: "5",
+        name: "Epsilon Parts",
+        supplierId: "SUP005E5",
+        contactNumber: "+971505678901",
+        addressLine1: "Sharjah Industrial Area",
+        addressLine2: "Block B",
+        active: false,
+        userId: "user123"
       }
     ];
 
@@ -350,7 +414,7 @@
     }
 
     let currentSort = { field: 'name', direction: 'asc' };
-    const PAGE_SIZE = 10; 
+    const PAGE_SIZE = 5; 
     let currentPage = 1;
 
     function renderSuppliers(filterText = "") {
@@ -358,17 +422,17 @@
       tbody.innerHTML = "";
       const suppliers = loadSuppliers();
 
-      const normalizedFilter = filterText.toLowerCase();
+      const headerName = (document.getElementById('search-name') ? document.getElementById('search-name').value.trim().toLowerCase() : '');
+      const headerId = (document.getElementById('search-id') ? document.getElementById('search-id').value.trim().toLowerCase() : '');
+      const statusFilterVal = (document.getElementById('status-filter') ? document.getElementById('status-filter').value : 'all');
 
       const filtered = suppliers.filter(s => {
-          if (!normalizedFilter) return true;
-          return (
-            s.name.toLowerCase().includes(normalizedFilter) ||
-            s.supplierId.toLowerCase().includes(normalizedFilter) ||
-            (s.addressLine1 || "").toLowerCase().includes(normalizedFilter) ||
-            (s.addressLine2 || "").toLowerCase().includes(normalizedFilter) ||
-            (s.contactNumber || "").toLowerCase().includes(normalizedFilter)
-          );
+          const matchesHeaderName = !headerName || (s.name || '').toLowerCase().includes(headerName);
+          const matchesHeaderId = !headerId || (s.supplierId || '').toLowerCase().includes(headerId);
+          const matchesStatus = statusFilterVal === 'all' ||
+                                (statusFilterVal === 'active' && s.active) ||
+                                (statusFilterVal === 'inactive' && !s.active);
+          return matchesHeaderName && matchesHeaderId && matchesStatus;
         });
 
       filtered.sort((a, b) => {
@@ -445,9 +509,9 @@
       supplier._id = supplier._id || Date.now().toString();
       suppliers.push(supplier);
       saveSuppliers(suppliers);
-    
-      currentPage = Math.ceil(suppliappearers.length / PAGE_SIZE);
-      renderSuppliers(document.getElementById("search-input").value);
+     
+      currentPage = Math.ceil(suppliers.length / PAGE_SIZE);
+      renderSuppliers();
     }
 
     function openSupplierForm() {
@@ -484,17 +548,22 @@
       const suppliers = loadSuppliers();
       const updated = suppliers.filter(s => s._id !== id);
       saveSuppliers(updated);
-    
+
       const totalPages = Math.max(1, Math.ceil(updated.length / PAGE_SIZE));
       if (currentPage > totalPages) currentPage = totalPages;
-      renderSuppliers(document.getElementById("search-input").value);
+      renderSuppliers();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const addBtn = document.getElementById("addSupplierBtn");
       const tbody = document.getElementById("supplierBody");
-      const searchInput = document.getElementById("search-input");
+      const searchNameInput = document.getElementById("search-name");
+      const searchIdInput = document.getElementById("search-id");
       const sortBtn = document.getElementById("sortBtn");
+      const filterBtn = document.getElementById("filterBtn");
+      const filterPanel = document.getElementById("filterPanel");
+      const applyFilterBtn = document.getElementById("applyFilterBtn");
+      const clearFilterBtn = document.getElementById("clearFilterBtn");
+
       const saveBtn = document.getElementById('saveSupplierBtn');
       const cancelBtn = document.getElementById('cancelSupplierBtn');
 
@@ -508,9 +577,28 @@
 
       updateSortButton();
 
-      addBtn.addEventListener("click", () => {
-        openSupplierForm();
-      });
+
+
+      if (filterBtn && filterPanel) {
+        filterBtn.addEventListener('click', () => {
+          filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+
+      if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', () => {
+          currentPage = 1;
+          renderSuppliers();
+        });
+      }
+
+      if (clearFilterBtn) {
+        clearFilterBtn.addEventListener('click', () => {
+          if (document.getElementById('status-filter')) document.getElementById('status-filter').value = 'all';
+          currentPage = 1;
+          renderSuppliers();
+        });
+      }
 
       tbody.addEventListener("click", e => {
         if (e.target.classList.contains("delete")) {
@@ -520,19 +608,32 @@
         }
       });
 
-      searchInput.addEventListener("input", e => {
-        currentPage = 1; 
-        renderSuppliers(e.target.value);
-      });
+      if (searchNameInput) {
+        searchNameInput.addEventListener("input", () => {
+          currentPage = 1;
+          renderSuppliers();
+        });
+      }
+
+      if (searchIdInput) {
+        searchIdInput.addEventListener("input", () => {
+          currentPage = 1;
+          renderSuppliers();
+        });
+      }
+
+
 
       if (sortBtn) {
         sortBtn.addEventListener('click', () => {
           currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-          currentPage = 1;
+          currentPage = 1; // reset page when changing sort
           updateSortButton();
-          renderSuppliers(searchInput.value);
+          renderSuppliers();
         });
       }
+
+      // Pagination click handling
       const pagination = document.getElementById('pagination');
       if (pagination) {
         pagination.addEventListener('click', (e) => {
@@ -547,7 +648,7 @@
             const pageNum = Number(p);
             if (!Number.isNaN(pageNum)) currentPage = pageNum;
           }
-          renderSuppliers(searchInput.value);
+          renderSuppliers();
         });
       }
 
