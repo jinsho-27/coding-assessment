@@ -3,173 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <title>Supplier Management</title>
-  <style>* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-body {
-  display: flex;
-  min-height: 100vh;
-  background: #f4f6f8;
-  color: #1f2933;
-}
-
-
-.sidebar {
-  width: 70px;
-  background: #2b2bb2;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 16px;
-}
-
-.logo {
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
-.nav-item {
-  display: block;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  text-decoration: none;
-  color: #c7d2ff;
-  padding: 12px 0;
-  font-size: 11px;
-}
-
-.nav-item.active,
-.nav-item:hover {
-  color: #ffffff;
-}
-
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  height: 56px;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.topbar h1 {
-  font-size: 14px;
-  letter-spacing: 2px;
-}
-
-.user-area {
-  text-align: right;
-  font-size: 12px;
-}
-
-.user-role {
-  display: block;
-  color: #6b7280;
-}
-
-.content {
-  padding: 20px 24px;
-}
-
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.content-header h2 {
-  font-size: 16px;
-}
-
-.btn-primary {
-  background: #2b2bb2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 14px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background: #23239a;
-}
-
-.table-wrapper {
-  background: #ffffff;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-thead {
-  background: #f3f4f6;
-  text-align: left;
-}
-
-th,
-td {
-  padding: 10px 12px;
-  white-space: nowrap;
-}
-
-tbody tr:nth-child(even) {
-  background: #f9fafb;
-}
-
-.badge {
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-}
-
-.badge-active {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-
-.icon-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 14px;
-  margin-right: 4px;
-}
-
-
-@media (max-width: 768px) {
-  .sidebar {
-    display: none;
-  }
-
-  .topbar {
-    padding: 0 12px;
-  }
-
-  .content {
-    padding: 12px;
-  }
-}</style>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: #f4f6f8;
+      color: #1f2933;
+    }
+    .sidebar {
+      width: 70px;
+      background: #2b2bb2;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 16px;
+    }
+    .logo {
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .nav-item {
+      display: block;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      text-decoration: none;
+      color: #c7d2ff;
+      padding: 12px 0;
+      font-size: 11px;
+    }
+    .nav-item.active,
+    .nav-item:hover {
+      color: #ffffff;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      height: 56px;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .topbar h1 {
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+    .user-area {
+      text-align: right;
+      font-size: 12px;
+    }
+    .user-role {
+      display: block;
+      color: #6b7280;
+    }
+    .content {
+      padding: 20px 24px;
+    }
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+    .content-header h2 {
+      font-size: 16px;
+    }
+    .content-header input[type="text"] {
+      flex: 1;
+      max-width: 260px;
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+    }
+    .btn-primary {
+      background: #2b2bb2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #23239a;
+    }
+    .table-wrapper {
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead {
+      background: #f3f4f6;
+      text-align: left;
+    }
+    th,
+    td {
+      padding: 10px 12px;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    .badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+    .badge-active {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .badge-inactive {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .icon-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 4px;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .topbar {
+        padding: 0 12px;
+      }
+      .content {
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
   <aside class="sidebar">
@@ -193,68 +179,196 @@ tbody tr:nth-child(even) {
 
     <section class="content">
       <div class="content-header">
-        <h2>Suppliers</h2>
-        <label for="sreach-button">
-          <input type="text" id="search-input" placeholder="Search Suppliers..." />
-        </label>
-        <button id="addSupplierBtn" class="btn-primary">+ Add Supplier</button>
-      </div>
+  <h2>Suppliers</h2>
+  <input type="text" id="search-input" placeholder="Search Suppliers..." />
+  <button id="search-btn" class="btn-primary">Search</button>
+  <button id="addSupplierBtn" class="btn-primary">+ Add Supplier</button>
+</div>
+
 
       <div class="table-wrapper">
         <table>
           <thead>
-          <tr>
-            <th>SUPPLIER NAME</th>
-            <th>SUPPLIER ID</th>
-            <th>ADDRESS LINE 1</th>
-            <th>ADDRESS LINE 2</th>
-            <th>CONTACT NUMBER</th>
-            <th>STATUS</th>
-            <th>ACTIONS</th>
-          </tr>
+            <tr>
+              <th>SUPPLIER NAME</th>
+              <th>SUPPLIER ID</th>
+              <th>ADDRESS LINE 1</th>
+              <th>ADDRESS LINE 2</th>
+              <th>CONTACT NUMBER</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
           </thead>
           <tbody id="supplierBody">
-          <tr>
-            <td>ABC</td>
-            <td>1234785</td>
-            <td>ANAND</td>
-            <td>Revada</td>
-            <td>+91 123457890</td>
-            <td><span class="badge badge-active">Active</span></td>
-            <td>
-              <button class="icon-btn edit">✏</button>
-              <button class="icon-btn delete">🗑</button>
-            </td>
-          </tr>
           </tbody>
         </table>
       </div>
     </section>
   </div>
-  <script>  const addBtn = document.getElementById("addSupplierBtn");
-const tbody = document.getElementById("supplierBody");
 
-addBtn.addEventListener("click", () => {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>New Supplier</td>
-    <td>${Math.floor(Math.random() * 900000) + 100000}</td>
-    <td>Main Street</td>
-    <td>City</td>
-    <td>+91 0000000000</td>
-    <td><span class="badge badge-active">Active</span></td>
-    <td>
-      <button class="icon-btn edit">✏</button>
-      <button class="icon-btn delete">🗑</button>
-    </td>
-  `;
-  tbody.appendChild(row);
-});
+  <script>
+    const STORAGE_KEY = "suppliers";
 
-tbody.addEventListener("click", (e) => {
-  if (e.target.classList.contains("delete")) {
-    e.target.closest("tr").remove();
-  }
-});</script>
+    const defaultSuppliers = [
+      {
+        _id: "1",
+        name: "Alpha Traders",
+        supplierId: "SUP001A1",
+        contactNumber: "+971501234567",
+        addressLine1: "Business Bay",
+        addressLine2: "Office 101",
+        active: true,
+        userId: "user123"
+      },
+      {
+        _id: "2",
+        name: "Beta Supplies",
+        supplierId: "SUP002B2",
+        contactNumber: "+971502345678",
+        addressLine1: "Deira Market",
+        addressLine2: "Warehouse 5",
+        active: false,
+        userId: "user123"
+      },
+      {
+        _id: "3",
+        name: "Gamma Corporation",
+        supplierId: "SUP003C3",
+        contactNumber: "+971503456789",
+        addressLine1: "Jumeirah",
+        addressLine2: "Suite 10",
+        active: true,
+        userId: "user123"
+      },
+      {
+        _id: "4",
+        name: "Delta Wholesale",
+        supplierId: "SUP004D4",
+        contactNumber: "+971504567890",
+        addressLine1: "Al Quoz",
+        addressLine2: "",
+        active: true,
+        userId: "user456"
+      },
+      {
+        _id: "5",
+        name: "Epsilon Parts",
+        supplierId: "SUP005E5",
+        contactNumber: "+971505678901",
+        addressLine1: "Sharjah Industrial Area",
+        addressLine2: "Block B",
+        active: false,
+        userId: "user123"
+      }
+    ];
+
+    function loadSuppliers() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultSuppliers));
+        return [...defaultSuppliers];
+      }
+      try {
+        return JSON.parse(stored) || [];
+      } catch {
+        return [...defaultSuppliers];
+      }
+    }
+
+    function saveSuppliers(suppliers) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(suppliers));
+    }
+
+    function renderSuppliers(filterText = "") {
+      const tbody = document.getElementById("supplierBody");
+      tbody.innerHTML = "";
+      const suppliers = loadSuppliers();
+
+      const normalizedFilter = filterText.toLowerCase();
+
+      suppliers
+        .filter(s => {
+          if (!normalizedFilter) return true;
+          return (
+            s.name.toLowerCase().includes(normalizedFilter) ||
+            s.supplierId.toLowerCase().includes(normalizedFilter) ||
+            (s.addressLine1 || "").toLowerCase().includes(normalizedFilter) ||
+            (s.addressLine2 || "").toLowerCase().includes(normalizedFilter) ||
+            (s.contactNumber || "").toLowerCase().includes(normalizedFilter)
+          );
+        })
+        .forEach(supplier => {
+          const row = document.createElement("tr");
+          row.dataset.id = supplier._id;
+          row.innerHTML = `
+            <td>${supplier.name}</td>
+            <td>${supplier.supplierId}</td>
+            <td>${supplier.addressLine1 || ""}</td>
+            <td>${supplier.addressLine2 || ""}</td>
+            <td>${supplier.contactNumber || ""}</td>
+            <td>
+              <span class="badge ${supplier.active ? "badge-active" : "badge-inactive"}">
+                ${supplier.active ? "Active" : "Inactive"}
+              </span>
+            </td>
+            <td>
+              <button class="icon-btn edit">✏</button>
+              <button class="icon-btn delete">🗑</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+    }
+
+    function addSupplier() {
+      const suppliers = loadSuppliers();
+      const newId = Date.now().toString();
+      const newSupplier = {
+        _id: newId,
+        name: "New Supplier",
+        supplierId: `SUP${Math.floor(Math.random() * 900000 + 100000)}`,
+        contactNumber: "+91 0000000000",
+        addressLine1: "Main Street",
+        addressLine2: "City",
+        active: true,
+        userId: "user123"
+      };
+      suppliers.push(newSupplier);
+      saveSuppliers(suppliers);
+      renderSuppliers(document.getElementById("search-input").value);
+    }
+
+    function deleteSupplier(id) {
+      const suppliers = loadSuppliers();
+      const updated = suppliers.filter(s => s._id !== id);
+      saveSuppliers(updated);
+      renderSuppliers(document.getElementById("search-input").value);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const addBtn = document.getElementById("addSupplierBtn");
+      const tbody = document.getElementById("supplierBody");
+      const searchInput = document.getElementById("search-input");
+
+      renderSuppliers();
+
+      addBtn.addEventListener("click", () => {
+        addSupplier();
+      });
+
+      tbody.addEventListener("click", e => {
+        if (e.target.classList.contains("delete")) {
+          const row = e.target.closest("tr");
+          const id = row.dataset.id;
+          deleteSupplier(id);
+        }
+      });
+
+      searchInput.addEventListener("input", e => {
+        renderSuppliers(e.target.value);
+      });
+    });
+    
+  </script>
 </body>
 </html>
