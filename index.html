@@ -251,8 +251,7 @@
     <section class="content">
       <div class="content-header">
   <h2>Suppliers</h2>
-  <input type="text" id="search-name" placeholder="Search by Name..." />
-  <input type="text" id="search-id" placeholder="Search by Supplier ID..." />
+  <input type="text" id="search" placeholder="Search by Name or Supplier ID..." />
   <button id="filterBtn" class="btn-primary">Filter</button>
   <button id="sortBtn" class="btn-primary" aria-pressed="false" title="Toggle sort">Sort: A→Z</button>
 </div>
@@ -275,13 +274,8 @@
 
       <div id="filterPanel" class="filter-panel" style="display:none;">
         <div class="filter-row">
-          <label>Status<br />
-            <select id="status-filter" style="padding:6px 8px;border-radius:4px;border:1px solid #d1d5db;font-size:13px;">
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </label>
+          <label>Name<br /><input id="filter-name" type="text" placeholder="Filter by Name..." /></label>
+          <label>Supplier ID<br /><input id="filter-id" type="text" placeholder="Filter by Supplier ID..." /></label>
         </div>
         <div class="form-actions">
           <button id="applyFilterBtn" class="btn-primary">Apply</button>
@@ -422,17 +416,13 @@
       tbody.innerHTML = "";
       const suppliers = loadSuppliers();
 
-      const headerName = (document.getElementById('search-name') ? document.getElementById('search-name').value.trim().toLowerCase() : '');
-      const headerId = (document.getElementById('search-id') ? document.getElementById('search-id').value.trim().toLowerCase() : '');
-      const statusFilterVal = (document.getElementById('status-filter') ? document.getElementById('status-filter').value : 'all');
+      const headerSearch = (document.getElementById('search') ? document.getElementById('search').value.trim().toLowerCase() : '');
 
       const filtered = suppliers.filter(s => {
-          const matchesHeaderName = !headerName || (s.name || '').toLowerCase().includes(headerName);
-          const matchesHeaderId = !headerId || (s.supplierId || '').toLowerCase().includes(headerId);
-          const matchesStatus = statusFilterVal === 'all' ||
-                                (statusFilterVal === 'active' && s.active) ||
-                                (statusFilterVal === 'inactive' && !s.active);
-          return matchesHeaderName && matchesHeaderId && matchesStatus;
+          if (!headerSearch) return true;
+          const nameMatch = (s.name || '').toLowerCase().includes(headerSearch);
+          const idMatch = (s.supplierId || '').toLowerCase().includes(headerSearch);
+          return nameMatch || idMatch;
         });
 
       filtered.sort((a, b) => {
@@ -556,8 +546,9 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       const tbody = document.getElementById("supplierBody");
-      const searchNameInput = document.getElementById("search-name");
-      const searchIdInput = document.getElementById("search-id");
+      const searchInput = document.getElementById("search");
+      const filterNameInput = document.getElementById("filter-name");
+      const filterIdInput = document.getElementById("filter-id");
       const sortBtn = document.getElementById("sortBtn");
       const filterBtn = document.getElementById("filterBtn");
       const filterPanel = document.getElementById("filterPanel");
@@ -581,12 +572,21 @@
 
       if (filterBtn && filterPanel) {
         filterBtn.addEventListener('click', () => {
-          filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
+          const isHidden = filterPanel.style.display === 'none' || !filterPanel.style.display;
+          filterPanel.style.display = isHidden ? 'block' : 'none';
+          if (isHidden) {
+            if (filterNameInput) filterNameInput.value = searchInput ? searchInput.value : '';
+            if (filterIdInput) filterIdInput.value = '';
+          }
         });
       }
 
       if (applyFilterBtn) {
         applyFilterBtn.addEventListener('click', () => {
+          if (searchInput) {
+            const combined = [filterNameInput?.value.trim(), filterIdInput?.value.trim()].filter(Boolean).join(' ');
+            searchInput.value = combined;
+          }
           currentPage = 1;
           renderSuppliers();
         });
@@ -594,7 +594,9 @@
 
       if (clearFilterBtn) {
         clearFilterBtn.addEventListener('click', () => {
-          if (document.getElementById('status-filter')) document.getElementById('status-filter').value = 'all';
+          if (filterNameInput) filterNameInput.value = '';
+          if (filterIdInput) filterIdInput.value = '';
+          if (searchInput) searchInput.value = '';
           currentPage = 1;
           renderSuppliers();
         });
@@ -608,15 +610,8 @@
         }
       });
 
-      if (searchNameInput) {
-        searchNameInput.addEventListener("input", () => {
-          currentPage = 1;
-          renderSuppliers();
-        });
-      }
-
-      if (searchIdInput) {
-        searchIdInput.addEventListener("input", () => {
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
           currentPage = 1;
           renderSuppliers();
         });
