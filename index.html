@@ -442,8 +442,15 @@
       const suppliers = loadSuppliers();
 
       const headerSearch = (document.getElementById('search') ? document.getElementById('search').value.trim().toLowerCase() : '');
+      const filterNameVal = (document.getElementById('filter-name') ? document.getElementById('filter-name').value.trim().toLowerCase() : '');
+      const filterIdVal = (document.getElementById('filter-id') ? document.getElementById('filter-id').value.trim().toLowerCase() : '');
 
       const filtered = suppliers.filter(s => {
+          
+          if (filterNameVal && ((s.name || '').toLowerCase() !== filterNameVal)) return false;
+          if (filterIdVal && ((s.supplierId || '').toLowerCase() !== filterIdVal)) return false;
+
+          
           if (!headerSearch) return true;
           const nameMatch = (s.name || '').toLowerCase().includes(headerSearch);
           const idMatch = (s.supplierId || '').toLowerCase().includes(headerSearch);
@@ -627,8 +634,11 @@
       if (applyFilterBtn) {
         applyFilterBtn.addEventListener('click', () => {
           if (searchInput) {
-            const combined = [filterNameSelect?.value.trim(), filterIdSelect?.value.trim()].filter(Boolean).join(' ');
-            searchInput.value = combined;
+           
+            const currentTokens = (searchInput.value || '').split(/\s+/).filter(Boolean);
+            const toRemove = [filterNameSelect?.value.trim(), filterIdSelect?.value.trim()].filter(Boolean).map(t => t.toLowerCase());
+            const remaining = currentTokens.filter(tok => !toRemove.includes(tok.toLowerCase()));
+            searchInput.value = remaining.join(' ');
           }
           currentPage = 1;
           renderSuppliers();
@@ -639,7 +649,6 @@
         clearFilterBtn.addEventListener('click', () => {
           if (filterNameSelect) filterNameSelect.value = '';
           if (filterIdSelect) filterIdSelect.value = '';
-          if (searchInput) searchInput.value = '';
           currentPage = 1;
           renderSuppliers();
         });
